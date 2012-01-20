@@ -89,7 +89,7 @@ class ConnectionModifyTests(LDAPConnectionTests):
 
     def test_modify_explicit_delete(self):
         conn = self._makeSimple()
-        conn.insert('dc=localhost', 'cn=foo', attrs={'a': 'a', 'b':'b'})
+        conn.insert('dc=localhost', 'cn=foo', attrs={'a': 'a', 'b': ['b', 'c']})
         import ldap
         conn.modify( 'cn=foo,dc=localhost'
                    , mod_type=ldap.MOD_DELETE
@@ -97,6 +97,14 @@ class ConnectionModifyTests(LDAPConnectionTests):
                    )
         rec = conn.search('dc=localhost', fltr='(cn=foo)')['results'][0]
         self.failIf(rec.get('a'))
+
+        # Delete a subset of a multi-valued field
+        conn.modify( 'cn=foo,dc=localhost'
+                   , mod_type=ldap.MOD_DELETE
+                   , attrs={'b':['c']}
+                   )
+        rec = conn.search('dc=localhost', fltr='(cn=foo)')['results'][0]
+        self.assertEquals(rec['b'], ['b'])
 
         # Trying to modify the record by providing an empty or non-matching
         # value should not result in any changes.

@@ -333,7 +333,7 @@ class LDAPConnection(object):
             elif values == [''] and mod_type in (ldap.MOD_ADD, ldap.MOD_DELETE):
                 continue
             elif ( mod_type == ldap.MOD_DELETE and
-                   set(values) != set(cur_rec.get(key, [])) ):
+                   set(values).difference(set(cur_rec.get(key, []))) ):
                 continue
             else:
                 mod_list.append((mod_type, key, values))
