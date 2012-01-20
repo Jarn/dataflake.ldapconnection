@@ -1,0 +1,162 @@
+Change log
+==========
+
+1.3 (unreleased)
+----------------
+
+
+1.2 (2010-08-09)
+----------------
+- Using ``id()`` is not random enough for a unique hash.
+
+
+1.1 (2010-05-09)
+----------------
+- Updated Sphinx Makefile and configuration to be closer
+  to the latest Sphinx version
+
+- Greatly expand installation and testing documentation using
+  ideas from Tres Seaver
+
+
+1.0 (2010-04-12)
+----------------
+- Bug: fakeldap.FakeLDAPConnection wildcard searches did not 
+  work correctly and returned too many matches.
+
+- Bug: Improve behavior matching of standard python-ldap and 
+  fakeldap by raising ldap.NO_SUCH_OBJECT where operations 
+  target non-existing entries.
+
+- Bug: Improve behavior matching of standard python-ldap and 
+  fakeldap by raising ldap.ALREADY_EXISTS where operations 
+  duplicate existing entries.
+
+- Bug: Added tests for all fakeldap.FakeLDAPConnection methods
+  and added tests for some other module classes and functions.
+
+- Refactoring: Removed the fakeldap.initialize and explode_dn 
+  functions. They were either not needed or needlessly 
+  duplicating existing python-ldap features.
+
+- Bug: python-ldap will no longer support the LDAP connection 
+  class ldap.ldapobject.SmartLDAPObject with version 2.3.11.
+  Replacing it with ReconnectLDAPObject.
+
+- Bug: If a connection raised an LDAP exception inside 
+  start_tls_s handling was broken.
+
+- Feature: You can now add server definitions for servers that 
+  support the StartTLS extended operation. Whereas the existing 
+  secure connections using the ``ldaps`` protocol are encrypted 
+  throughout, StartTLS is used through an unencrypted connection
+  to request all further traffic to be encrypted.
+
+- Refactoring: Switch tests to using the fakeldap LDAP connection 
+  object wherever possible, and correct a few fakeldap and 
+  LDAPConnection misbehaviors along the way.
+
+
+1.0b1 (2010-02-01)
+------------------
+
+- Performing more rigorous input checking for DNs
+
+- Made encoding/decoding more flexible by adding configuration 
+  flags for the encoding used by the LDAP server and the 
+  encoding for calls to and return values from the connection API.
+  The default is backwards compatible (UTF-8 for the LDAP server 
+  encoding, and Latin-15 for the API encoding).
+
+- Factored the connection tests module into a series of modules,
+  it was getting large and unwieldy.
+
+- move the actual python-ldap connection from an attribute into
+  a module-level cache since those connections cannot be
+  pickled.
+
+- Removed the rdn_attr attribute, which was used to try and 
+  determine if a modify operation should trigger a modrdn. We 
+  now fish the RDN attribute from the record's DN for this 
+  purpose.
+
+- Changed the way internal logging is done to avoid storing logger
+  objects onto the connection instance unless it is explicitly
+  specified. This means the instance is picklable when using the 
+  default logging.
+
+- Removed the `bind` method. There was no good reason to expose it 
+  as part of the public API, and since bind operations are 
+  re-done as part of all operations it would only serve to 
+  confuse users.
+  Users who want to use credentials other than the credentials 
+  configured into the connection instance should pass them along 
+  explicitly when invoking the operation.
+
+- The search method now provides a default search subtree search 
+  scope if none is specified.
+
+- Creating a new instance does not require passing server data like 
+  host, port and protocol anymore.
+
+- replaced several methods with better alternatives from python-ldap,
+  which also requires upping the dependency to python-ldap>=2.3.0, 
+  and fixing up the tests.
+
+- pare down fakeldap to not try and provide all kinds of constants 
+  from python-ldap, but just a LDAP connection class.
+
+- add a new method "bind" to rebind a connection, if the last bind
+  differs from the desired bind.
+
+- rename variable name "filter" with "fltr" to stop shadowing the 
+  Python function "filter".
+
+- added an interfaces file as documentation and "contract". This adds 
+  a dependency on zope.interface.
+
+- removed unused argument "login_attr" from constructor argument list
+
+- LDAPConnection objects now accept more than a single server definition.
+  Failover between connections is triggered by connection or operation
+  timeouts. Added API to add and remove server definitions at runtime.
+
+- all those methods causing LDAP operations to be performed accept 
+  optional bind_dn and bind_pwd named arguments to rebind with the 
+  provided credentials instead of those credentials stored in the 
+  LDAPConnection instance. This represents an API change for the 
+  `insert`, `modify` and `delete` methods.
+
+
+0.4 (2008-12-25)
+----------------
+
+- fakeldap bug: the modify_s method would expect changes of type MOD_DELETE
+  to come with a list of specific attribute values to delete. Now the 
+  attribute will be deleted as a whole if the expected list is None, this
+  reflects actual python-ldap behavior better.
+
+- now we are exercising the fakeldap doctests from within this package,
+  they used to be run from Products.LDAPUserFolder, which was not cleaned
+  up when the fakeldap module moved to dataflake.ldapconnection.
+
+0.3 (2008-08-30)
+----------------
+
+- fakeldap: no longer override the LDAP exceptions, just get them from
+  python-ldap.
+  (http://www.dataflake.org/tracker/issue_00620)
+
+
+0.2 (2008-08-27)
+----------------
+
+- backport a fix applied to the LDAPUserFolder FakeLDAP module to handle
+  BASE-scoped searches on a DN.
+
+
+0.1 (2008-06-11)
+----------------
+
+- Initial release.
+
