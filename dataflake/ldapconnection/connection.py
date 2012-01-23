@@ -60,9 +60,7 @@ class LDAPConnection(object):
         self.ldap_encoding = 'UTF-8'
         self.api_encoding = 'iso-8859-15'
 
-        if isinstance(bind_dn, unicode):
-            bind_dn = bind_dn.encode(self.api_encoding)
-        self.bind_dn = escape_dn(bind_dn).decode(self.api_encoding)
+        self.bind_dn = bind_dn
         self.bind_pwd = bind_pwd
         self.read_only = read_only
         self.c_factory = c_factory
@@ -115,10 +113,11 @@ class LDAPConnection(object):
             raise RuntimeError('No servers defined')
 
         if bind_dn is None:
-            bind_dn = self._encode_bind_dn()
-            bind_pwd = self.bind_pwd
+            bind_dn = escape_dn(self._encode_incoming(self.bind_dn))
+            bind_pwd = self._encode_incoming(self.bind_pwd)
         else:
-            bind_dn = escape_dn(self._encode_bind_dn(bind_dn))
+            bind_dn = escape_dn(self._encode_incoming(bind_dn))
+            bind_pwd = self._encode_incoming(bind_pwd)
 
         conn = self._getConnection()
         if conn is None:
@@ -377,7 +376,7 @@ class LDAPConnection(object):
         if ldapurl.isLDAPUrl(ldap_url):
             conn_str = ldapurl.LDAPUrl(ldap_url).initializeUrl()
             conn = self._connect(conn_str)
-            conn.simple_bind_s(self._encode_bind_dn(), self.bind_pwd)
+            conn.simple_bind_s(self._encode_incoming(self.bind_dn), self._encode_incoming(self.bind_pwd))
             return conn
         else:
             raise ldap.CONNECT_ERROR, 'Bad referral "%s"' % str(exception)
@@ -411,10 +410,11 @@ class LDAPConnection(object):
 
         else:
             if self.api_encoding != self.ldap_encoding:
-                value = value.decode(self.api_encoding)
+                if self.api_encoding:
+                    value = value.decode(self.api_encoding)
 
-                if self.ldap_encoding:
-                    value = value.encode(self.ldap_encoding)
+                    if self.ldap_encoding:
+                        value = value.encode(self.ldap_encoding)
         
         return value
 
@@ -422,7 +422,7 @@ class LDAPConnection(object):
         """ Encode a string value to the API encoding
 
         - if "value" is unicode, it will be encoded to self.api_encoding, but
-          only if self.ldap_encoding is set.
+          only if self.api_encoding is set.
         - if "value" is not unicode, it is assumed to be encoded as 
           self.ldap_encoding. It is decoded and encoded to self.api_encoding
           if self.api_encoding is set, unless self.ldap_encoding and 
@@ -438,21 +438,10 @@ class LDAPConnection(object):
 
         else:
             if self.api_encoding != self.ldap_encoding:
-                value = value.decode(self.ldap_encoding)
+                if self.ldap_encoding:
+                    value = value.decode(self.ldap_encoding)
 
-                if self.api_encoding:
-                    value = value.encode(self.api_encoding)
+                    if self.api_encoding:
+                        value = value.encode(self.api_encoding)
         
         return value
-
-    def _encode_bind_dn(self, dn=None):
-        """ Make sure the stored bind DN is encoded correctly upon access
-        """
-        bind_dn = dn or getattr(self, 'bind_dn', '')
-
-        if not isinstance(bind_dn, unicode):
-            bind_dn = bind_dn.decode(self.api_encoding)
-
-        return bind_dn.encode(self.ldap_encoding)
-
-

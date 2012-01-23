@@ -45,7 +45,6 @@ class ConnectionBasicTests(LDAPConnectionTests):
 
     def test_constructor(self):
         bind_dn_encoded = 'cn=%s,dc=localhost' % ISO_8859_1_ENCODED
-        bind_dn_unicode = u'cn=%s,dc=localhost' % ISO_8859_1_UNICODE
         conn = self._makeOne( 'localhost'
                             , 389
                             , 'ldap'
@@ -57,7 +56,7 @@ class ConnectionBasicTests(LDAPConnectionTests):
                             , op_timeout=10
                             , logger='logger'
                             )
-        self.assertEqual(conn.bind_dn, bind_dn_unicode)
+        self.assertEqual(conn.bind_dn, bind_dn_encoded)
         self.assertEqual(conn.bind_pwd, 'foo')
         self.failUnless(conn.read_only)
         self.assertEqual(conn._getConnection(), None)
