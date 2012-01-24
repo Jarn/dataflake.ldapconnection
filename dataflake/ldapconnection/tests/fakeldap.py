@@ -376,6 +376,11 @@ def apply_filter(tree_pos, base, fltr):
                 res.append(('%s,%s' % (key, base), val))
     return res
 
+def filter_attrs(entry, attrs):
+    if not attrs:
+        return entry
+    return dict([(k, v) for k, v in entry.items() if k in attrs])
+
 class FakeLDAPConnection:
 
     def __init__(self, *args, **kw):
@@ -441,9 +446,9 @@ class FakeLDAPConnection:
             # Return all objects, no matter what class
             if scope == ldap.SCOPE_BASE and tree_pos_dn == base:
                 # Only if dn matches 'base'
-                return (([base, tree_pos],))
+                return [(base, filter_attrs(tree_pos, attrs))]
             else:
-                return tree_pos.items()
+                return [(k, filter_attrs(v, attrs)) for k, v in tree_pos.items()]
 
         by_level = {}
         for idx, (operation, filters) in enumerate(explode_query(q)):
@@ -497,7 +502,7 @@ class FakeLDAPConnection:
                         lvl[:] = new_lvl
         if by_level:
             # Return the last one.
-            return by_level[idx]
+            return [(k, filter_attrs(v, attrs)) for k, v in by_level[idx]]
 
         return []
 
