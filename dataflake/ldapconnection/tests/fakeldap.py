@@ -376,11 +376,6 @@ def apply_filter(tree_pos, base, fltr):
                 res.append(('%s,%s' % (key, base), val))
     return res
 
-def filter_attrs(entry, attrs):
-    if not attrs:
-        return entry
-    return dict([(k, v) for k, v in entry.items() if k in attrs])
-
 class FakeLDAPConnection:
 
     def __init__(self, *args, **kw):
@@ -396,7 +391,7 @@ class FakeLDAPConnection:
     def simple_bind_s(self, binduid, bindpwd):
         self._last_bind = (self.simple_bind_s, (binduid, bindpwd), {})
 
-        if binduid.find('Manager') != -1:
+        if 'Manager' in binduid:
             return 1
 
         if bindpwd == '':
@@ -422,6 +417,16 @@ class FakeLDAPConnection:
         else:
             raise ldap.INVALID_CREDENTIALS
 
+    def _filter_attrs(self, entry, attrs):
+        if not attrs:
+            return entry
+        results = dict([(k, v) for k, v in entry.items() if k in attrs])
+        # Return passwords only to Manager
+        if 'Manager' not in self._last_bind[1][0]:
+            if 'userPassword' in results:
+                del results['userPassword']
+        return results
+
     def search_s(self, base, scope=ldap.SCOPE_SUBTREE,
                  query='(objectClass=*)', attrs=()):
 
@@ -446,9 +451,9 @@ class FakeLDAPConnection:
             # Return all objects, no matter what class
             if scope == ldap.SCOPE_BASE and tree_pos_dn == base:
                 # Only if dn matches 'base'
-                return [(base, filter_attrs(tree_pos, attrs))]
+                return [(base, self._filter_attrs(tree_pos, attrs))]
             else:
-                return [(k, filter_attrs(v, attrs)) for k, v in tree_pos.items()]
+                return [(k, self._filter_attrs(v, attrs)) for k, v in tree_pos.items()]
 
         by_level = {}
         for idx, (operation, filters) in enumerate(explode_query(q)):
@@ -502,7 +507,7 @@ class FakeLDAPConnection:
                         lvl[:] = new_lvl
         if by_level:
             # Return the last one.
-            return [(k, filter_attrs(v, attrs)) for k, v in by_level[idx]]
+            return [(k, self._filter_attrs(v, attrs)) for k, v in by_level[idx]]
 
         return []
 
