@@ -376,6 +376,7 @@ def apply_filter(tree_pos, base, fltr):
                 res.append(('%s,%s' % (key, base), val))
     return res
 
+
 class FakeLDAPConnection:
 
     def __init__(self, *args, **kw):
@@ -507,7 +508,6 @@ class FakeLDAPConnection:
 
         return []
 
-
     def add_s(self, dn, attr_list):
         elems = explode_dn(dn)
         elems.reverse()
@@ -532,6 +532,10 @@ class FakeLDAPConnection:
         for key, val in attr_list:
             rec[key] = val
 
+            # Maintain memberOf
+            if key == 'member':
+                for v in val:
+                    self.modify_s(v, [(ldap.MOD_ADD, 'memberOf', [dn])])
 
     def delete_s(self, dn):
         elems = explode_dn(dn)
@@ -548,6 +552,15 @@ class FakeLDAPConnection:
 
         if not tree_pos.has_key(rdn):
             raise ldap.NO_SUCH_OBJECT(rdn)
+
+        # Maintain memberOf
+        rec = tree_pos[rdn]
+        if 'member' in rec:
+            for v in rec['member']:
+                self.modify_s(v, [(ldap.MOD_DELETE, 'memberOf', [dn])])
+        if 'memberOf' in rec:
+            for v in rec['memberOf']:
+                self.modify_s(v, [(ldap.MOD_DELETE, 'member', [dn])])
 
         del tree_pos[rdn]
 
@@ -589,6 +602,16 @@ class FakeLDAPConnection:
                         rec[mod[1]] = cur_vals
 
         tree_pos[rdn] = rec
+
+        # Maintain memberOf
+        for mod in mod_list:
+            if mod[1] == 'member':
+                if mod[0] == ldap.MOD_ADD:
+                    for v in mod[2]:
+                        self.modify_s(v, [(ldap.MOD_ADD, 'memberOf', [dn])])
+                elif mod[0] == ldap.MOD_DELETE:
+                    for v in mod[2]:
+                        self.modify_s(v, [(ldap.MOD_DELETE, 'memberOf', [dn])])
 
     def modrdn_s(self, dn, new_rdn, *ign):
         elems = explode_dn(dn)
