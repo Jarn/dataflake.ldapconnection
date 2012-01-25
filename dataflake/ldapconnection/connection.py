@@ -119,7 +119,7 @@ class LDAPConnection(object):
             bind_dn = escape_dn(self._encode_incoming(bind_dn))
             bind_pwd = self._encode_incoming(bind_pwd)
 
-        conn = connection_cache.get(self.hash)
+        conn = self._getConnection()
         if conn is None:
             for server in self.servers.values():
                 try:
@@ -152,6 +152,11 @@ class LDAPConnection(object):
             conn.simple_bind_s(bind_dn, bind_pwd)
 
         return conn
+
+    def _getConnection(self):
+        """ Private helper to get my connection out of the cache
+        """
+        return connection_cache.get(self.hash)
 
     def _connect( self
                 , connection_string
