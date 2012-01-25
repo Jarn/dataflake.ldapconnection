@@ -415,14 +415,13 @@ class FakeLDAPConnection:
             raise ldap.INVALID_CREDENTIALS
 
     def _filter_attrs(self, entry, attrs):
-        if not attrs:
-            return entry
-        results = dict([(k, v) for k, v in entry.items() if k in attrs])
         # Return passwords only to Manager
         if 'Manager' not in self._last_bind[1][0]:
-            if 'userPassword' in results:
-                del results['userPassword']
-        return results
+            if 'userPassword' in entry:
+                del entry['userPassword']
+        if not attrs:
+            return entry
+        return dict([(k, v) for k, v in entry.items() if k in attrs])
 
     def search_s(self, base, scope=ldap.SCOPE_SUBTREE,
                  query='(objectClass=*)', attrs=()):
