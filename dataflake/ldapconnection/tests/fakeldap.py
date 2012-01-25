@@ -398,10 +398,6 @@ class FakeLDAPConnection:
             # Emulate LDAP mis-behavior
             return 1
 
-        sha_obj = sha_new(bindpwd)
-        sha_dig = sha_obj.digest()
-        enc_bindpwd = '{SHA}%s' % base64.encodestring(sha_dig)
-        enc_bindpwd = enc_bindpwd.strip()
         rec = self.search_s(binduid)
         rec_pwd = ''
         for key, val_list in rec:
@@ -412,7 +408,7 @@ class FakeLDAPConnection:
         if not rec_pwd:
             raise ldap.INVALID_CREDENTIALS
 
-        if enc_bindpwd == rec_pwd:
+        if bindpwd == rec_pwd:
             return 1
         else:
             raise ldap.INVALID_CREDENTIALS

@@ -76,10 +76,7 @@ class LDAPConnectionTests(unittest.TestCase):
     def _addRecord(self, dn, **kw):
         record = fakeldap.addTreeItems(dn)
         for key, value in kw.items():
-            if key.lower() == 'userpassword':
-                sha_digest = fakeldap.sha_new(value).digest()
-                value = ['{SHA}%s' % base64.encodestring(sha_digest).strip()]
-            elif isinstance(value, basestring):
+            if isinstance(value, basestring):
                 value = [value]
             record[key] = value
 
@@ -107,10 +104,8 @@ class FakeLDAPTests(unittest.TestCase):
         conn = self._makeOne()
         user_dn = 'cn=%s,ou=users,dc=localhost' % name
         user_pwd = '%s_secret' % name
-        sha_digest = fakeldap.sha_new(user_pwd).digest()
-        pwd = '{SHA}%s' % base64.encodestring(sha_digest).strip()
         user = [ ('cn', [name])
-               , ('userPassword', [pwd])
+               , ('userPassword', [user_pwd])
                , ('objectClass', ['top', 'person'])
                ]
         conn.add_s(user_dn, user)
