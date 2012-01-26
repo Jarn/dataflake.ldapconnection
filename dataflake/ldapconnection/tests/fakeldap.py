@@ -560,6 +560,7 @@ class FakeLDAPConnection:
         if 'memberOf' in rec:
             for v in rec['memberOf']:
                 self.modify_s(v, [(ldap.MOD_DELETE, 'member', [dn])])
+                self.modify_s(v, [(ldap.MOD_DELETE, 'owner', [dn])])
 
         del tree_pos[rdn]
 
