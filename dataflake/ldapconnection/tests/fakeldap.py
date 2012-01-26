@@ -416,7 +416,7 @@ class FakeLDAPConnection:
 
     def _filter_attrs(self, entry, attrs):
         # Return passwords only to Manager
-        if 'Manager' not in self._last_bind[1][0]:
+        if not (self._last_bind and 'Manager' in self._last_bind[1][0]):
             if 'userPassword' in entry:
                 del entry['userPassword']
         if not attrs:
