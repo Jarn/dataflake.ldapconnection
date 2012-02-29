@@ -386,6 +386,11 @@ class FakeLDAPConnection:
         self._last_bind = None
         self.start_tls_called = False
 
+    def _filter_attrs(self, entry, attrs):
+        if not attrs:
+            return entry
+        return dict([(k, v) for k, v in entry.items() if k in attrs])
+
     def set_option(self, option, value):
         self.options[option] = value
 
@@ -413,15 +418,6 @@ class FakeLDAPConnection:
             return 1
         else:
             raise ldap.INVALID_CREDENTIALS
-
-    def _filter_attrs(self, entry, attrs):
-        # Return passwords only to Manager
-        if not (self._last_bind and 'Manager' in self._last_bind[1][0]):
-            if 'userPassword' in entry:
-                del entry['userPassword']
-        if not attrs:
-            return entry
-        return dict([(k, v) for k, v in entry.items() if k in attrs])
 
     def search_s(self, base, scope=ldap.SCOPE_SUBTREE,
                  query='(objectClass=*)', attrs=()):
@@ -644,6 +640,9 @@ class FakeLDAPConnection:
         return ('partial', [('partial result', {'dn': 'partial result'})])
 
     def unbind(self):
+        pass
+
+    def unbind_s(self):
         pass
 
 
