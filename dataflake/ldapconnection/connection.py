@@ -193,6 +193,7 @@ class LDAPConnection(object):
               , convert_filter=True
               , bind_dn=None
               , bind_pwd=None
+              , raw=False
               ):
         """ Search for entries in the database
         """
@@ -228,15 +229,17 @@ class LDAPConnection(object):
                 # 'items' not found on rec_dict
                 continue
 
-            for key, value in items:
-                if key.lower() not in BINARY_ATTRIBUTES:
-                    if not isinstance(value, basestring):
-                        for i in range(len(value)):
-                            value[i] = self._encode_outgoing(value[i])
-                    else:
-                        rec_dict[key] = self._encode_outgoing(value)
-
-            rec_dict['dn'] = self._encode_outgoing(rec_dn)
+            if raw:
+                rec_dict['dn'] = rec_dn
+            else:
+                for key, value in items:
+                    if key.lower() not in BINARY_ATTRIBUTES:
+                        if not isinstance(value, basestring):
+                            for i in range(len(value)):
+                                value[i] = self._encode_outgoing(value[i])
+                        else:
+                            rec_dict[key] = self._encode_outgoing(value)
+                rec_dict['dn'] = self._encode_outgoing(rec_dn)
 
             result['results'].append(rec_dict)
             result['size'] += 1
@@ -308,6 +311,7 @@ class LDAPConnection(object):
                          , scope=ldap.SCOPE_BASE
                          , bind_dn=bind_dn
                          , bind_pwd=bind_pwd
+                         , raw=True
                          )
         attrs = attrs and attrs or {}
         cur_rec = res['results'][0]
