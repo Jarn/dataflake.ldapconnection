@@ -230,7 +230,7 @@ class LDAPConnection(object):
 
             for key, value in items:
                 if key.lower() not in BINARY_ATTRIBUTES:
-                    if not isinstance(value, str):
+                    if not isinstance(value, basestring):
                         for i in range(len(value)):
                             value[i] = self._encode_outgoing(value[i])
                     else:
