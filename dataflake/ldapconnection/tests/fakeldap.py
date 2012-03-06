@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 #
 # Copyright (c) 2000-2009 Jens Vagelpohl and Contributors. All Rights Reserved.
@@ -55,7 +56,7 @@ import re
 _FLTR = r'\(\w*?=[\*\w\s=,\\]*?\)'
 _OP = '[&\|\!]{1}'
 
-FLTR = r'\((?P<attr>\w*?)(?P<comp>=)(?P<value>[\*\w\s=,\\\'@\-\+_\.]*?)\)'
+FLTR = r'\((?P<attr>\w*?)(?P<comp>=)(?P<value>[\*\w\s=,\\\'@\-\+_\.øØæÆåÅäÄöÖüÜß]*?)\)'
 FLTR_RE = re.compile(FLTR + '(?P<fltr>.*)')
 
 OP = '\((?P<op>(%s))(?P<fltr>(%s)*)\)' % (_OP, _FLTR)
