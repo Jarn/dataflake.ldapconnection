@@ -378,6 +378,7 @@ def apply_filter(tree_pos, base, fltr):
     return res
 
 def filter_attrs(entry, attrs):
+    entry = copy.deepcopy(entry)
     if not attrs:
         return entry
     return dict((k, v) for k, v in entry.items() if k in attrs)
