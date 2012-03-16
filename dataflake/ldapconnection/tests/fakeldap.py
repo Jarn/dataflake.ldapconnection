@@ -386,6 +386,9 @@ def filter_attrs(entry, attrs):
 class FakeLDAPConnection:
 
     hash_password = True
+    maintain_memberof = False
+    member_attr = 'member'
+    memberof_attr = 'memberOf'
 
     def __init__(self, *args, **kw):
         self.args = args
@@ -537,9 +540,10 @@ class FakeLDAPConnection:
             rec[key] = val
 
             # Maintain memberOf
-            if key == 'member':
-                for v in val:
-                    self.modify_s(v, [(ldap.MOD_ADD, 'memberOf', [dn])])
+            if self.maintain_memberof:
+                if key == self.member_attr:
+                    for v in val:
+                        self.modify_s(v, [(ldap.MOD_ADD, self.memberof_attr, [dn])])
 
     def delete_s(self, dn):
         elems = explode_dn(dn)
@@ -558,14 +562,14 @@ class FakeLDAPConnection:
             raise ldap.NO_SUCH_OBJECT(rdn)
 
         # Maintain memberOf
-        rec = tree_pos[rdn]
-        if 'member' in rec:
-            for v in rec['member']:
-                self.modify_s(v, [(ldap.MOD_DELETE, 'memberOf', [dn])])
-        if 'memberOf' in rec:
-            for v in rec['memberOf']:
-                self.modify_s(v, [(ldap.MOD_DELETE, 'member', [dn])])
-                self.modify_s(v, [(ldap.MOD_DELETE, 'owner', [dn])])
+        if self.maintain_memberof:
+            rec = tree_pos[rdn]
+            if self.member_attr in rec:
+                for v in rec[self.member_attr]:
+                    self.modify_s(v, [(ldap.MOD_DELETE, self.memberof_attr, [dn])])
+            if self.memberof_attr in rec:
+                for v in rec[self.memberof_attr]:
+                    self.modify_s(v, [(ldap.MOD_DELETE, self.member_attr, [dn])])
 
         del tree_pos[rdn]
 
@@ -609,14 +613,15 @@ class FakeLDAPConnection:
         tree_pos[rdn] = rec
 
         # Maintain memberOf
-        for mod in mod_list:
-            if mod[1] == 'member':
-                if mod[0] == ldap.MOD_ADD:
-                    for v in mod[2]:
-                        self.modify_s(v, [(ldap.MOD_ADD, 'memberOf', [dn])])
-                elif mod[0] == ldap.MOD_DELETE:
-                    for v in mod[2]:
-                        self.modify_s(v, [(ldap.MOD_DELETE, 'memberOf', [dn])])
+        if self.maintain_memberof:
+            for mod in mod_list:
+                if mod[1] == self.member_attr:
+                    if mod[0] == ldap.MOD_ADD:
+                        for v in mod[2]:
+                            self.modify_s(v, [(ldap.MOD_ADD, self.memberof_attr, [dn])])
+                    elif mod[0] == ldap.MOD_DELETE:
+                        for v in mod[2]:
+                            self.modify_s(v, [(ldap.MOD_DELETE, self.memberof_attr, [dn])])
 
     def modrdn_s(self, dn, new_rdn, *ign):
         elems = explode_dn(dn)
