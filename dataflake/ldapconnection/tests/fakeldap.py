@@ -385,6 +385,8 @@ def filter_attrs(entry, attrs):
 
 class FakeLDAPConnection:
 
+    hash_password = True
+
     def __init__(self, *args, **kw):
         self.args = args
         self.kwargs = kw
@@ -405,6 +407,12 @@ class FakeLDAPConnection:
             # Emulate LDAP mis-behavior
             return 1
 
+        if self.hash_password:
+            sha_digest = sha_new(bindpwd).digest()
+            enc_bindpwd = '{SHA}%s' % base64.encodestring(sha_digest).strip()
+        else:
+            enc_bindpwd = bindpwd
+
         rec = self.search_s(binduid)
         rec_pwd = ''
         for key, val_list in rec:
@@ -415,7 +423,7 @@ class FakeLDAPConnection:
         if not rec_pwd:
             raise ldap.INVALID_CREDENTIALS
 
-        if bindpwd == rec_pwd:
+        if enc_bindpwd == rec_pwd:
             return 1
         else:
             raise ldap.INVALID_CREDENTIALS
