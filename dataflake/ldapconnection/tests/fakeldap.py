@@ -17,7 +17,7 @@ $Id: FakeLDAP.py 1485 2008-06-04 16:08:38Z jens $
 """
 
 import base64
-import copy
+from copy import deepcopy
 try:
     from hashlib import sha1 as sha_new
 except ImportError:
@@ -378,7 +378,6 @@ def apply_filter(tree_pos, base, fltr):
     return res
 
 def filter_attrs(entry, attrs):
-    entry = copy.deepcopy(entry)
     if not attrs:
         return entry
     return dict((k, v) for k, v in entry.items() if k in attrs)
@@ -445,9 +444,9 @@ class FakeLDAPConnection:
             # Return all objects, no matter what class
             if scope == ldap.SCOPE_BASE and tree_pos_dn == base:
                 # Only if dn matches 'base'
-                return [(base, filter_attrs(tree_pos, attrs))]
+                return [(base, filter_attrs(deepcopy(tree_pos), attrs))]
             else:
-                return [(k, filter_attrs(v, attrs)) for k, v in tree_pos.items()]
+                return [(k, filter_attrs(deepcopy(v), attrs)) for k, v in tree_pos.items()]
 
         by_level = {}
         for idx, (operation, filters) in enumerate(explode_query(q)):
@@ -501,7 +500,7 @@ class FakeLDAPConnection:
                         lvl[:] = new_lvl
         if by_level:
             # Return the last one.
-            return [(k, filter_attrs(v, attrs)) for k, v in by_level[idx]]
+            return [(k, filter_attrs(deepcopy(v), attrs)) for k, v in by_level[idx]]
 
         return []
 
@@ -578,7 +577,7 @@ class FakeLDAPConnection:
         if not tree_pos.has_key(rdn):
             raise ldap.NO_SUCH_OBJECT(rdn)
 
-        rec = copy.deepcopy(tree_pos.get(rdn))
+        rec = deepcopy(tree_pos.get(rdn))
 
         for mod in mod_list:
             if mod[0] == ldap.MOD_REPLACE:
