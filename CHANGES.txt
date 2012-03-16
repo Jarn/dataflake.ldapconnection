@@ -3,6 +3,36 @@ Change log
 
 1.3 (unreleased)
 ----------------
+- fakeldap: Add email characters and certain non-ASCII characters to
+  FLTR_RE.
+  [stefan]
+
+- fakeldap: Add unbind_s API.
+  [stefan]
+
+- fakeldap: Deepcopy entries before returning them.
+  [stefan]
+
+- fakeldap: Only return requested attributes.
+  [stefan]
+
+- fakeldap: Optionally disable password hashing.
+  [stefan]
+
+- fakeldap: Optionally maintain the 'memberOf' attribute of group
+  members.
+  [stefan]
+
+- connection: Various fixes with regard to Unicode handling, i.e.
+  when the api_encoding is set to None.
+  [stefan]
+
+- connection: New 'raw' kwarg for the search API. If true, results
+  are returned in the ldap_encoding.
+  [stefan]
+
+- connection: Allow to delete subsets from multi-valued attributes.
+  [stefan]
 
 
 1.2 (2010-08-09)
