@@ -185,6 +185,14 @@ class LDAPConnection(object):
 
         return connection
 
+    def disconnect(self):
+        """ Unbind the connection and invalidate the cache
+        """
+        conn = self._getConnection()
+        if conn is not None:
+            connection_cache.invalidate(self.hash)
+            conn.unbind_s()
+
     def search( self
               , base
               , scope=ldap.SCOPE_SUBTREE

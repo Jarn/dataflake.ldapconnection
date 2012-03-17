@@ -94,6 +94,48 @@ class ConnectionConnectTests(LDAPConnectionTests):
         connection = conn.connect()
         self.failIf(connection.options.has_key(ldap.OPT_REFERRALS))
 
+    def test_disconnect_clears_connection_cache(self):
+        from dataflake.ldapconnection.tests import fakeldap
+        conn = self._makeSimple()
+
+        attrs = {'userPassword': fakeldap.hash_pwd('pass')}
+        conn.insert('dc=localhost', 'cn=foo', attrs=attrs)
+
+        response = conn.search( 'dc=localhost'
+                              , fltr='(cn=foo)'
+                              , bind_dn='cn=foo,dc=localhost'
+                              , bind_pwd='pass'
+                              )
+        self.assertEquals(response['size'], 1)
+
+        connection = conn._getConnection()
+        self.assertNotEquals(connection, None)
+        self.assertEquals(connection._last_bind[1], ('cn=foo,dc=localhost', 'pass'))
+
+        conn.disconnect()
+        self.assertEquals(conn._getConnection(), None)
+
+    def test_disconnect_unbinds_connection(self):
+        from dataflake.ldapconnection.tests import fakeldap
+        conn = self._makeSimple()
+
+        attrs = {'userPassword': fakeldap.hash_pwd('pass')}
+        conn.insert('dc=localhost', 'cn=foo', attrs=attrs)
+
+        response = conn.search( 'dc=localhost'
+                              , fltr='(cn=foo)'
+                              , bind_dn='cn=foo,dc=localhost'
+                              , bind_pwd='pass'
+                              )
+        self.assertEquals(response['size'], 1)
+
+        connection = conn._getConnection()
+        self.assertNotEquals(connection, None)
+        self.assertEquals(connection._last_bind[1], ('cn=foo,dc=localhost', 'pass'))
+
+        conn.disconnect()
+        self.assertEquals(connection._last_bind, None)
+
 
 def test_suite():
     import sys

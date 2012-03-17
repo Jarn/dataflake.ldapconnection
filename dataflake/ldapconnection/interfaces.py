@@ -76,6 +76,10 @@ class ILDAPConnection(Interface):
         thrown by the last attempted connection is re-raised.
         """
 
+    def disconnect():
+        """ Unbind the current server connection and invalidate the cache
+        """
+
     def search( base
               , scope=2
               , fltr='(objectClass=*)'
