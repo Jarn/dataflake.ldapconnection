@@ -201,6 +201,39 @@ class FakeLDAPSearchTests(FakeLDAPTests):
                                 ] )
                          )
 
+    def test_return_all_attributes(self):
+        conn = self._makeOne()
+        self._addUser('foo', mail='foo@foo.com')
+
+        res = conn.search_s( 'ou=users,dc=localhost'
+                           , query='(cn=foo)'
+                           , attrs=None
+                           )
+        self.assertEquals(len(res), 1)
+        dn, attr_dict = res[0]
+        self.assertEquals(dn, 'cn=foo,ou=users,dc=localhost')
+        self.assertTrue('cn' in attr_dict)
+        self.assertTrue('mail' in attr_dict)
+        self.assertTrue('userPassword' in attr_dict)
+        self.assertTrue('objectClass' in attr_dict)
+
+    def test_return_filtered_attributes(self):
+        conn = self._makeOne()
+        self._addUser('foo', mail='foo@foo.com')
+
+        res = conn.search_s( 'ou=users,dc=localhost'
+                           , query='(cn=foo)'
+                           , attrs=['cn', 'mail']
+                           )
+        self.assertEquals(len(res), 1)
+        dn, attr_dict = res[0]
+        self.assertEquals(dn, 'cn=foo,ou=users,dc=localhost')
+        self.assertTrue('cn' in attr_dict)
+        self.assertTrue('mail' in attr_dict)
+        self.assertFalse('userPassword' in attr_dict)
+        self.assertFalse('objectClass' in attr_dict)
+
+
 def test_suite():
     import sys
     return unittest.findTestCases(sys.modules[__name__])
