@@ -123,13 +123,13 @@ class ClearTextPasswordTests(FakeLDAPTests):
         class ClearTextConnection(FakeLDAPConnection):
             """ A FakeLDAPConnection with password hashing disabled
             """
-            hash_password = False
+            hash_passwords = False
 
         return ClearTextConnection
 
     def test_connection_is_clear_text(self):
         conn = self._makeOne()
-        self.assertEquals(conn.hash_password, False)
+        self.assertEquals(conn.hash_passwords, False)
 
     def test_password_is_clear_text(self):
         conn = self._makeOne()
