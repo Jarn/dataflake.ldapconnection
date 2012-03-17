@@ -28,7 +28,8 @@ class ConnectionConnectTests(LDAPConnectionTests):
         conn = self._makeSimple()
         connection = conn.connect()
         binduid, bindpwd = connection._last_bind[1]
-        self.assertEqual(binduid, u'')
+        self.assertTrue(isinstance(binduid, str))
+        self.assertEqual(binduid, '')
         self.assertEqual(bindpwd, '')
         self.failIf(getattr(connection, 'timeout', False))
         self.assertEquals( connection.options.get(ldap.OPT_REFERRALS)

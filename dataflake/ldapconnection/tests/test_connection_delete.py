@@ -29,7 +29,8 @@ class ConnectionDeleteTests(LDAPConnectionTests):
         conn.delete('cn=foo,dc=localhost')
         connection = conn._getConnection()
         binduid, bindpwd = connection._last_bind[1]
-        self.assertEqual(binduid, u'')
+        self.assertTrue(isinstance(binduid, str))
+        self.assertEqual(binduid, '')
         self.assertEqual(bindpwd, '')
 
     def test_delete_authentication(self):

@@ -34,7 +34,8 @@ class ConnectionModifyTests(LDAPConnectionTests):
                    )
         connection = conn._getConnection()
         binduid, bindpwd = connection._last_bind[1]
-        self.assertEqual(binduid, u'')
+        self.assertTrue(isinstance(binduid, str))
+        self.assertEqual(binduid, '')
         self.assertEqual(bindpwd, '')
 
     def test_modify_authentication(self):
