@@ -71,6 +71,16 @@ class FakeLDAPBindTests(FakeLDAPTests):
                          , 'ANY PASSWORD'
                          )
 
+    def test_unbind_clears_last_bind(self):
+        conn = self._makeOne()
+        user_dn, password = self._addUser('foo')
+
+        self.failUnless(conn.simple_bind_s(user_dn, password))
+        self.assertEquals(conn._last_bind[1], (user_dn, password))
+
+        conn.unbind_s()
+        self.assertEquals(conn._last_bind, None)
+
 
 class HashedPasswordTests(FakeLDAPTests):
 

@@ -662,10 +662,10 @@ class FakeLDAPConnection:
         return ('partial', [('partial result', {'dn': 'partial result'})])
 
     def unbind(self):
-        pass
+        self.unbind_s()
 
     def unbind_s(self):
-        pass
+        self._last_bind = None
 
 
 class RaisingFakeLDAPConnection(FakeLDAPConnection):
