@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 #
 # Copyright (c) 2008-2010 Jens Vagelpohl and Contributors. All Rights Reserved.
@@ -15,11 +16,11 @@
 $Id: test_fakeldap_bind.py 1901 2010-02-07 19:01:08Z jens $
 """
 
-import base64
 import doctest
 import unittest
 
 from dataflake.ldapconnection.tests.base import FakeLDAPTests
+from dataflake.ldapconnection.tests.base import fakeldap
 
 class FakeLDAPBindTests(FakeLDAPTests):
 
@@ -61,7 +62,6 @@ class FakeLDAPBindTests(FakeLDAPTests):
         import ldap
         conn = self._makeOne()
 
-
         # Users with empty passwords cannot log in
         user2 = [('cn', ['user2'])]
         conn.add_s('cn=user2,ou=users,dc=localhost', user2)
@@ -69,6 +69,98 @@ class FakeLDAPBindTests(FakeLDAPTests):
                          , conn.simple_bind_s
                          , 'cn=user2,ou=users,dc=localhost'
                          , 'ANY PASSWORD'
+                         )
+
+
+class HashedPasswordTests(FakeLDAPTests):
+
+    def test_hash_pwd(self):
+        pwd = fakeldap.hash_pwd('secret')
+        self.assertTrue(isinstance(pwd, str))
+        self.assertTrue(pwd.startswith('{SHA}'))
+
+    def test_hash_unicode_pwd(self):
+        pwd = fakeldap.hash_pwd(u'bjørn')
+        self.assertTrue(isinstance(pwd, str))
+        self.assertTrue(pwd.startswith('{SHA}'))
+
+    def test_password_is_hashed(self):
+        conn = self._makeOne()
+        self._addUser('foo')
+
+        res = conn.search_s( 'ou=users,dc=localhost'
+                           , query='(cn=foo)'
+                           )
+        pwd = res[0][1]['userPassword'][0]
+        self.assertEquals(pwd, fakeldap.hash_pwd('foo_secret'))
+
+    def test_bind_success(self):
+        conn = self._makeOne()
+        user_dn, password = self._addUser('foo')
+
+        # Login with correct credentials
+        self.failUnless(conn.simple_bind_s(user_dn, password))
+        self.assertEquals(conn._last_bind[1], (user_dn, password))
+
+    def test_bind_wrong_pwd(self):
+        import ldap
+        conn = self._makeOne()
+        user_dn, password = self._addUser('foo')
+
+        # Login with bad credentials
+        self.assertRaises( ldap.INVALID_CREDENTIALS
+                         , conn.simple_bind_s
+                         , user_dn
+                         , 'INVALID PASSWORD'
+                         )
+
+
+class ClearTextPasswordTests(FakeLDAPTests):
+
+    def _getTargetClass(self):
+        from dataflake.ldapconnection.tests.fakeldap import FakeLDAPConnection
+
+        class ClearTextConnection(FakeLDAPConnection):
+            """ A FakeLDAPConnection with password hashing disabled
+            """
+            hash_password = False
+
+        return ClearTextConnection
+
+    def test_connection_is_clear_text(self):
+        conn = self._makeOne()
+        self.assertEquals(conn.hash_password, False)
+
+    def test_password_is_clear_text(self):
+        conn = self._makeOne()
+        user_dn, password = self._addUser('foo')
+
+        res = conn.search_s( 'ou=users,dc=localhost'
+                           , query='(cn=foo)'
+                           )
+        pwd = res[0][1]['userPassword'][0]
+        self.assertEquals(pwd, 'foo_secret')
+
+    def test_bind_success(self):
+        conn = self._makeOne()
+        user_dn, password = self._addUser('foo')
+
+        # Login with correct credentials
+        self.assertEquals(user_dn, 'cn=foo,ou=users,dc=localhost')
+        self.assertEquals(password, 'foo_secret')
+        self.failUnless(conn.simple_bind_s(user_dn, password))
+        self.assertEquals(conn._last_bind[1], (user_dn, password))
+
+    def test_bind_wrong_pwd(self):
+        import ldap
+        conn = self._makeOne()
+        user_dn, password = self._addUser('foo')
+
+        # Login with bad credentials
+        self.assertRaises( ldap.INVALID_CREDENTIALS
+                         , conn.simple_bind_s
+                         , user_dn
+                         , 'INVALID PASSWORD'
                          )
 
 
