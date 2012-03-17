@@ -382,6 +382,12 @@ def filter_attrs(entry, attrs):
         return entry
     return dict((k, v) for k, v in entry.items() if k in attrs)
 
+def hash_pwd(string):
+    if isinstance(string, unicode):
+        string = string.encode('utf-8')
+    sha_digest = sha_new(string).digest()
+    return '{SHA}%s' % base64.encodestring(sha_digest).strip()
+
 
 class FakeLDAPConnection:
 
@@ -412,8 +418,7 @@ class FakeLDAPConnection:
             return 1
 
         if self.hash_password:
-            sha_digest = sha_new(bindpwd).digest()
-            enc_bindpwd = '{SHA}%s' % base64.encodestring(sha_digest).strip()
+            enc_bindpwd = hash_pwd(bindpwd)
         else:
             enc_bindpwd = bindpwd
 

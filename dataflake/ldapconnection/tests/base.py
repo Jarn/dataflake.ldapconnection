@@ -15,7 +15,6 @@
 $Id: base.py 1901 2010-02-07 19:01:08Z jens $
 """
 
-import base64
 import unittest
 
 from dataflake.ldapconnection.connection import connection_cache
@@ -77,8 +76,7 @@ class LDAPConnectionTests(unittest.TestCase):
         record = fakeldap.addTreeItems(dn)
         for key, value in kw.items():
             if key.lower() == 'userpassword':
-                sha_digest = fakeldap.sha_new(value).digest()
-                value = ['{SHA}%s' % base64.encodestring(sha_digest).strip()]
+                value = [fakeldap.hash_pwd(value)]
             elif isinstance(value, basestring):
                 value = [value]
             record[key] = value
@@ -106,13 +104,18 @@ class FakeLDAPTests(unittest.TestCase):
         conn = self._makeOne()
         user_dn = 'cn=%s,ou=users,dc=localhost' % name
         user_pwd = '%s_secret' % name
-        sha_digest = fakeldap.sha_new(user_pwd).digest()
-        pwd = '{SHA}%s' % base64.encodestring(sha_digest).strip()
+
+        if conn.hash_password:
+            pwd = fakeldap.hash_pwd(user_pwd)
+        else:
+            pwd = user_pwd
+
         user = [ ('cn', [name])
                , ('userPassword', [pwd])
                , ('objectClass', ['top', 'person'])
                ]
         if mail is not None:
             user.append(('mail', [mail]))
+
         conn.add_s(user_dn, user)
         return (user_dn, user_pwd)
