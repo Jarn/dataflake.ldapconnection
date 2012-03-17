@@ -102,8 +102,7 @@ class FakeLDAPTests(unittest.TestCase):
         conn = self._getTargetClass()(*args, **kw)
         return conn
 
-
-    def _addUser(self, name):
+    def _addUser(self, name, mail=None):
         conn = self._makeOne()
         user_dn = 'cn=%s,ou=users,dc=localhost' % name
         user_pwd = '%s_secret' % name
@@ -113,6 +112,7 @@ class FakeLDAPTests(unittest.TestCase):
                , ('userPassword', [pwd])
                , ('objectClass', ['top', 'person'])
                ]
+        if mail is not None:
+            user.append(('mail', [mail]))
         conn.add_s(user_dn, user)
         return (user_dn, user_pwd)
-
