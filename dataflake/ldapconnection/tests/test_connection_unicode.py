@@ -28,15 +28,15 @@ class UnicodeSupportTests(LDAPConnectionTests):
         conn.api_encoding = None
 
         attrs = {'displayName': 'Bjørn'}
-        conn.insert('dc=localhost', 'cn=foo', attrs=attrs)
+        conn.insert('dc=localhost', 'cn=føø', attrs=attrs)
 
-        response = conn.search('dc=localhost', fltr='(cn=foo)')
+        response = conn.search('dc=localhost', fltr='(cn=føø)')
         self.assertEqual(response['size'], 1)
 
         results = response['results']
         self.assertEqual( results[0]
-                        , { 'dn': u'cn=foo,dc=localhost'
-                          , 'cn': [u'foo']
+                        , { 'dn': u'cn=føø,dc=localhost'
+                          , 'cn': [u'føø']
                           , 'displayName': [u'Bjørn']
                           }
                         )
@@ -46,15 +46,15 @@ class UnicodeSupportTests(LDAPConnectionTests):
         conn.api_encoding = None
 
         attrs = {'displayName': 'Bjørn'}
-        conn.insert('dc=localhost', 'cn=foo', attrs=attrs)
+        conn.insert('dc=localhost', 'cn=føø', attrs=attrs)
 
-        response = conn.search('dc=localhost', fltr='(cn=foo)', raw=True)
+        response = conn.search('dc=localhost', fltr='(cn=føø)', raw=True)
         self.assertEqual(response['size'], 1)
 
         results = response['results']
         self.assertEqual( results[0]
-                        , { 'dn': 'cn=foo,dc=localhost'
-                          , 'cn': ['foo']
+                        , { 'dn': 'cn=føø,dc=localhost'
+                          , 'cn': ['føø']
                           , 'displayName': ['Bjørn']
                           }
                         )
@@ -82,16 +82,17 @@ class UnicodeSupportTests(LDAPConnectionTests):
         conn.api_encoding = None
 
         attrs = {'displayName': u'Bjørn'}
-        conn.insert(u'dc=localhost', u'cn=foo', attrs=attrs)
-        conn.modify(u'cn=foo,dc=localhost', attrs={'displayName': u'Bjørn Åge'})
+        conn.insert(u'dc=localhost', u'cn=føø', attrs=attrs)
+        attrs = {'displayName': u'Bjørn Åge'}
+        conn.modify(u'cn=føø,dc=localhost', attrs=attrs)
 
-        response = conn.search(u'dc=localhost', fltr=u'(cn=foo)')
+        response = conn.search(u'dc=localhost', fltr=u'(cn=føø)')
         self.assertEqual(response['size'], 1)
 
         results = response['results']
         self.assertEqual( results[0]
-                        , { 'dn': u'cn=foo,dc=localhost'
-                          , 'cn': [u'foo']
+                        , { 'dn': u'cn=føø,dc=localhost'
+                          , 'cn': [u'føø']
                           , 'displayName': [u'Bjørn Åge']
                           }
                         )
@@ -100,18 +101,20 @@ class UnicodeSupportTests(LDAPConnectionTests):
         conn = self._makeSimple()
         conn.api_encoding = None
 
-        attrs = {'cn': [u'foo', u'Bjørn Åge']}
-        conn.insert(u'dc=localhost', u'cn=foo', attrs=attrs)
-        conn.modify(u'cn=foo,dc=localhost', attrs={'cn': [u'foo', u'Bjørn', u'Bjørn Åge']})
-        conn.modify(u'cn=foo,dc=localhost', attrs={'cn': [u'foo', u'Bjørn']})
+        attrs = {'cn': [u'føø', u'Bjørn Åge']}
+        conn.insert(u'dc=localhost', u'cn=føø', attrs=attrs)
+        attrs = {'cn': [u'føø', u'Bjørn', u'Bjørn Åge']}
+        conn.modify(u'cn=føø,dc=localhost', attrs=attrs)
+        attrs = {'cn': [u'føø', u'Bjørn']}
+        conn.modify(u'cn=føø,dc=localhost', attrs=attrs)
 
-        response = conn.search(u'dc=localhost', fltr=u'(cn=foo)')
+        response = conn.search(u'dc=localhost', fltr=u'(cn=føø)')
         self.assertEqual(response['size'], 1)
 
         results = response['results']
         self.assertEqual( results[0]
-                        , { 'dn': u'cn=foo,dc=localhost'
-                          , 'cn': [u'foo', u'Bjørn']
+                        , { 'dn': u'cn=føø,dc=localhost'
+                          , 'cn': [u'føø', u'Bjørn']
                           }
                         )
 
@@ -120,8 +123,8 @@ class UnicodeSupportTests(LDAPConnectionTests):
 
         results = response['results']
         self.assertEqual( results[0]
-                        , { 'dn': u'cn=foo,dc=localhost'
-                          , 'cn': [u'foo', u'Bjørn']
+                        , { 'dn': u'cn=føø,dc=localhost'
+                          , 'cn': [u'føø', u'Bjørn']
                           }
                         )
 
@@ -132,17 +135,38 @@ class UnicodeSupportTests(LDAPConnectionTests):
         conn = self._makeSimple()
         conn.api_encoding = None
 
-        attrs = {'displayName': u'Bjørn'}
-        conn.insert(u'dc=localhost', u'cn=foo', attrs=attrs)
-        conn.modify(u'cn=foo,dc=localhost', attrs={'cn': u'bar'})
+        attrs = {'displayName': u'Bjørn', 'cn': u'føø'}
+        conn.insert(u'dc=localhost', u'cn=føø', attrs=attrs)
+        attrs = {'cn': u'bår'}
+        conn.modify(u'cn=føø,dc=localhost', attrs=attrs)
 
-        response = conn.search(u'dc=localhost', fltr=u'(cn=bar)')
+        response = conn.search(u'dc=localhost', fltr=u'(cn=bår)')
         self.assertEqual(response['size'], 1)
 
         results = response['results']
         self.assertEqual( results[0]
-                        , { 'dn': u'cn=bar,dc=localhost'
-                          , 'cn': [u'bar']
+                        , { 'dn': u'cn=bår,dc=localhost'
+                          , 'cn': [u'bår']
+                          , 'displayName': [u'Bjørn']
+                          }
+                        )
+
+    def test_modify_multivalued_unicode_rdn(self):
+        conn = self._makeSimple()
+        conn.api_encoding = None
+
+        attrs = {'displayName': u'Bjørn', 'cn': [u'føø', u'Bjørn'],}
+        conn.insert(u'dc=localhost', u'cn=føø', attrs=attrs)
+        attrs = {'cn': [u'bår', u'Bjørn']}
+        conn.modify(u'cn=føø,dc=localhost', attrs=attrs)
+
+        response = conn.search(u'dc=localhost', fltr=u'(cn=bår)')
+        self.assertEqual(response['size'], 1)
+
+        results = response['results']
+        self.assertEqual( results[0]
+                        , { 'dn': u'cn=bår,dc=localhost'
+                          , 'cn': [u'bår', u'Bjørn']
                           , 'displayName': [u'Bjørn']
                           }
                         )
@@ -152,10 +176,10 @@ class UnicodeSupportTests(LDAPConnectionTests):
         conn.api_encoding = None
 
         attrs = {'displayName': u'Bjørn'}
-        conn.insert(u'dc=localhost', u'cn=foo', attrs=attrs)
-        conn.delete(u'cn=foo,dc=localhost')
+        conn.insert(u'dc=localhost', u'cn=føø', attrs=attrs)
+        conn.delete(u'cn=føø,dc=localhost')
 
-        response = conn.search(u'dc=localhost', fltr=u'(cn=foo)')
+        response = conn.search(u'dc=localhost', fltr=u'(cn=føø)')
         self.assertEqual(response['size'], 0)
 
     def test_bind_with_valid_unicode_credentials(self):
@@ -164,11 +188,11 @@ class UnicodeSupportTests(LDAPConnectionTests):
         conn.api_encoding = None
 
         attrs = {'userPassword': fakeldap.hash_pwd('secret')}
-        conn.insert(u'dc=localhost', u'cn=foo', attrs=attrs)
+        conn.insert(u'dc=localhost', u'cn=føø', attrs=attrs)
 
         response = conn.search( u'dc=localhost'
-                              , fltr=u'(cn=foo)'
-                              , bind_dn=u'cn=foo,dc=localhost'
+                              , fltr=u'(cn=føø)'
+                              , bind_dn=u'cn=føø,dc=localhost'
                               , bind_pwd=u'secret'
                               )
         self.assertEqual(response['size'], 1)
@@ -180,13 +204,13 @@ class UnicodeSupportTests(LDAPConnectionTests):
         conn.api_encoding = None
 
         attrs = {'userPassword': fakeldap.hash_pwd('secret')}
-        conn.insert(u'dc=localhost', u'cn=foo', attrs=attrs)
+        conn.insert(u'dc=localhost', u'cn=føø', attrs=attrs)
 
         self.assertRaises( ldap.INVALID_CREDENTIALS
                          , conn.search
                          , u'dc=localhost'
-                         , fltr=u'(cn=foo)'
-                         , bind_dn=u'cn=foo,dc=localhost'
+                         , fltr=u'(cn=føø)'
+                         , bind_dn=u'cn=føø,dc=localhost'
                          , bind_pwd=u'geheim'
                          )
 
@@ -196,12 +220,12 @@ class UnicodeSupportTests(LDAPConnectionTests):
         conn.api_encoding = None
 
         attrs = {'userPassword': fakeldap.hash_pwd('secret')}
-        conn.insert(u'dc=localhost', u'cn=foo', attrs=attrs)
+        conn.insert(u'dc=localhost', u'cn=føø', attrs=attrs)
 
-        conn.bind_dn = u'cn=foo,dc=localhost'
+        conn.bind_dn = u'cn=føø,dc=localhost'
         conn.bind_pwd = u'secret'
         response = conn.search( u'dc=localhost'
-                              , fltr=u'(cn=foo)'
+                              , fltr=u'(cn=føø)'
                               )
         self.assertEqual(response['size'], 1)
 
@@ -212,14 +236,14 @@ class UnicodeSupportTests(LDAPConnectionTests):
         conn.api_encoding = None
 
         attrs = {'userPassword': fakeldap.hash_pwd('secret')}
-        conn.insert(u'dc=localhost', u'cn=foo', attrs=attrs)
+        conn.insert(u'dc=localhost', u'cn=føø', attrs=attrs)
 
-        conn.bind_dn = u'cn=foo,dc=localhost'
+        conn.bind_dn = u'cn=føø,dc=localhost'
         conn.bind_pwd = u'geheim'
         self.assertRaises( ldap.INVALID_CREDENTIALS
                          , conn.search
                          , u'dc=localhost'
-                         , fltr=u'(cn=foo)'
+                         , fltr=u'(cn=føø)'
                          )
 
 
