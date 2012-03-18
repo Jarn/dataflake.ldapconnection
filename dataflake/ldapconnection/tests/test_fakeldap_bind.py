@@ -85,7 +85,7 @@ class HashedPasswordTests(FakeLDAPTests):
 
     def test_connection_is_hashed(self):
         conn = self._makeOne()
-        self.assertEquals(conn.hash_passwords, True)
+        self.assertEquals(conn.hash_password, True)
 
     def test_password_is_hashed(self):
         conn = self._makeOne()
