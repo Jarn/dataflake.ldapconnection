@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ##############################################################################
 #
 # Copyright (c) 2008-2010 Jens Vagelpohl and Contributors. All Rights Reserved.
@@ -56,10 +57,26 @@ class FakeLDAPBasicTests(FakeLDAPTests):
                          )
 
 
+class HashPwdTests(unittest.TestCase):
+
+    def test_hash_pwd(self):
+        from dataflake.ldapconnection.tests import fakeldap
+        pwd = fakeldap.hash_pwd('secret')
+        self.assertTrue(isinstance(pwd, str))
+        self.assertTrue(pwd.startswith('{SHA}'))
+
+    def test_hash_unicode_pwd(self):
+        from dataflake.ldapconnection.tests import fakeldap
+        pwd = fakeldap.hash_pwd(u'bjørn')
+        self.assertTrue(isinstance(pwd, str))
+        self.assertTrue(pwd.startswith('{SHA}'))
+
+
 def test_suite():
     from dataflake.ldapconnection.tests import fakeldap
     suite = unittest.TestSuite()
     suite.addTest(unittest.makeSuite(FakeLDAPBasicTests))
+    suite.addTest(unittest.makeSuite(HashPwdTests))
     suite.addTest(doctest.DocTestSuite(fakeldap))
     return suite
 

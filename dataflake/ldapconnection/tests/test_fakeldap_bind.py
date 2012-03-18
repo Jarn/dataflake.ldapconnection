@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##############################################################################
 #
 # Copyright (c) 2008-2010 Jens Vagelpohl and Contributors. All Rights Reserved.
@@ -84,15 +83,9 @@ class FakeLDAPBindTests(FakeLDAPTests):
 
 class HashedPasswordTests(FakeLDAPTests):
 
-    def test_hash_pwd(self):
-        pwd = fakeldap.hash_pwd('secret')
-        self.assertTrue(isinstance(pwd, str))
-        self.assertTrue(pwd.startswith('{SHA}'))
-
-    def test_hash_unicode_pwd(self):
-        pwd = fakeldap.hash_pwd(u'bjørn')
-        self.assertTrue(isinstance(pwd, str))
-        self.assertTrue(pwd.startswith('{SHA}'))
+    def test_connection_is_hashed(self):
+        conn = self._makeOne()
+        self.assertEquals(conn.hash_passwords, True)
 
     def test_password_is_hashed(self):
         conn = self._makeOne()
