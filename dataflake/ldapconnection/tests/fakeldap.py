@@ -391,7 +391,7 @@ def hash_pwd(string):
 
 class FakeLDAPConnection:
 
-    hash_passwords = True
+    hash_password = True
     maintain_memberof = False
     member_attr = 'member'
     memberof_attr = 'memberOf'
@@ -416,7 +416,7 @@ class FakeLDAPConnection:
             # Emulate LDAP mis-behavior
             return 1
 
-        if self.hash_passwords:
+        if self.hash_password:
             enc_bindpwd = hash_pwd(bindpwd)
         else:
             enc_bindpwd = bindpwd

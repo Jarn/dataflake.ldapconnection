@@ -106,7 +106,7 @@ class FakeLDAPTests(unittest.TestCase):
         user_dn = 'cn=%s,ou=users,dc=localhost' % name
         user_pwd = '%s_secret' % name
 
-        if conn.hash_passwords:
+        if conn.hash_password:
             pwd = fakeldap.hash_pwd(user_pwd)
         else:
             pwd = user_pwd
