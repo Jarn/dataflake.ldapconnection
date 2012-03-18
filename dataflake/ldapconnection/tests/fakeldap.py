@@ -395,7 +395,6 @@ class FakeLDAPConnection:
     maintain_memberof = False
     member_attr = 'member'
     memberof_attr = 'memberOf'
-    refint_attrs = ()
 
     def __init__(self, *args, **kw):
         self.args = args
@@ -576,8 +575,6 @@ class FakeLDAPConnection:
             if self.memberof_attr in rec:
                 for v in rec[self.memberof_attr]:
                     self.modify_s(v, [(ldap.MOD_DELETE, self.member_attr, [dn])])
-                    for attr in self.refint_attrs:
-                        self.modify_s(v, [(ldap.MOD_DELETE, attr, [dn])])
 
         del tree_pos[rdn]
 

@@ -180,58 +180,6 @@ class MemberOfTests(FakeLDAPTests):
             [])
 
 
-class RefIntTests(FakeLDAPTests):
-
-    def _getTargetClass(self):
-        from dataflake.ldapconnection.tests.fakeldap import FakeLDAPConnection
-
-        class RefIntConnection(FakeLDAPConnection):
-            """ A FakeLDAPConnection with memberof management and
-                refint attributes enabled.
-            """
-            maintain_memberof = True
-            refint_attrs = ('owner',)
-
-        return RefIntConnection
-
-    def test_connection_is_refint(self):
-        conn = self._makeOne()
-        self.assertEquals(conn.maintain_memberof, True)
-        self.assertEquals(conn.refint_attrs, ('owner',))
-
-    def test_add_refint_attr(self):
-        import ldap
-        conn = self._makeOne()
-        self._addUser('foo')
-        self._addGroup('engineering', ['foo'])
-
-        conn.modify_s('cn=engineering,ou=groups,dc=localhost',
-            [(ldap.MOD_ADD, 'owner', ['cn=foo,ou=users,dc=localhost'])])
-
-        res = conn.search_s( 'ou=groups,dc=localhost'
-                           , query='(cn=engineering)'
-                           )
-        self.assertEquals(res[0][1]['owner'],
-            ['cn=foo,ou=users,dc=localhost'])
-
-    def test_delete_user_updates_refint_attr(self):
-        import ldap
-        conn = self._makeOne()
-        self._addUser('foo')
-        self._addGroup('engineering', ['foo'])
-
-        conn.modify_s('cn=engineering,ou=groups,dc=localhost',
-            [(ldap.MOD_ADD, 'owner', ['cn=foo,ou=users,dc=localhost'])])
-
-        conn.delete_s('cn=foo,ou=users,dc=localhost')
-
-        res = conn.search_s( 'ou=groups,dc=localhost'
-                           , query='(cn=engineering)'
-                           )
-        self.assertEquals(res[0][1].get('owner', []),
-            [])
-
-
 def test_suite():
     import sys
     return unittest.findTestCases(sys.modules[__name__])
