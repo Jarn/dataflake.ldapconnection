@@ -147,8 +147,8 @@ class LDAPConnection(object):
 
         last_bind = getattr(conn, '_last_bind', None)
         if ( not last_bind or
-             ( last_bind[1][0] != bind_dn and 
-               last_bind[1][1] != bind_pwd ) ):
+             last_bind[1][0] != bind_dn or
+             last_bind[1][1] != bind_pwd ):
             conn.simple_bind_s(bind_dn, bind_pwd)
 
         return conn

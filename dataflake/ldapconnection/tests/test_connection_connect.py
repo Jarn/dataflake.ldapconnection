@@ -136,6 +136,28 @@ class ConnectionConnectTests(LDAPConnectionTests):
         conn.disconnect()
         self.assertEquals(connection._last_bind, None)
 
+    def test_rebind_with_same_password(self):
+        from dataflake.ldapconnection.tests import fakeldap
+        conn = self._makeSimple()
+
+        attrs = {'userPassword': fakeldap.hash_pwd('pass')}
+        conn.insert( 'dc=localhost'
+                   , 'cn=foo'
+                   , attrs=attrs
+                   , bind_dn='cn=Manager,dc=localhost'
+                   , bind_pwd='pass'
+                   )
+        connection = conn._getConnection()
+        self.assertEqual(connection._last_bind[1], ('cn=Manager,dc=localhost', 'pass'))
+
+        conn.search( 'dc=localhost'
+                   , fltr='(cn=foo)'
+                   , bind_dn='cn=foo,dc=localhost'
+                   , bind_pwd='pass'
+                   )
+        connection = conn._getConnection()
+        self.assertEqual(connection._last_bind[1], ('cn=foo,dc=localhost', 'pass'))
+
 
 def test_suite():
     import sys
