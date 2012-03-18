@@ -34,6 +34,13 @@ Change log
 - connection: Allow to delete subsets from multi-valued attributes.
   [stefan]
 
+- connection: Add disconnect API.
+  [stefan]
+
+- connection: Fix a condition that caused rebinding to fail if only
+  one of bind_dn and bind_pwd had changed.
+  [stefan]
+
 
 1.2 (2010-08-09)
 ----------------
