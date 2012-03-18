@@ -388,7 +388,8 @@ class LDAPConnection(object):
         if ldapurl.isLDAPUrl(ldap_url):
             conn_str = ldapurl.LDAPUrl(ldap_url).initializeUrl()
             conn = self._connect(conn_str)
-            conn.simple_bind_s(self._encode_incoming(self.bind_dn), self._encode_incoming(self.bind_pwd))
+            conn.simple_bind_s(self._encode_incoming(self.bind_dn),
+                               self._encode_incoming(self.bind_pwd))
             return conn
         else:
             raise ldap.CONNECT_ERROR, 'Bad referral "%s"' % str(exception)
