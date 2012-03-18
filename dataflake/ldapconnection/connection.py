@@ -360,13 +360,14 @@ class LDAPConnection(object):
                 raw_rdn = [raw_rdn]
             new_rdn = raw_rdn[0]
 
-            if new_rdn and new_rdn != cur_rec.get(rdn_attr)[0]:
+            if new_rdn:
                 rdn_value = self._encode_incoming(new_rdn)
-                dn_parts[0] = [(rdn_attr, rdn_value, 1)]
-                raw_utf8_rdn = self._encode_incoming(rdn_attr + '=' + rdn_value)
-                new_rdn = escape_dn(raw_utf8_rdn)
-                connection.modrdn_s(dn, new_rdn)
-                dn = dn2str(dn_parts)
+                if rdn_value != cur_rec.get(rdn_attr)[0]:
+                    dn_parts[0] = [(rdn_attr, rdn_value, 1)]
+                    raw_utf8_rdn = rdn_attr + '=' + rdn_value
+                    new_rdn = escape_dn(raw_utf8_rdn)
+                    connection.modrdn_s(dn, new_rdn)
+                    dn = dn2str(dn_parts)
 
             if mod_list:
                 connection.modify_s(dn, mod_list)
