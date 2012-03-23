@@ -22,11 +22,3 @@ Bug tracker
 A bug tracker is available at
 https://bugs.launchpad.net/dataflake.ldapconnection
 
-
-SVN version
-===========
-You can retrieve the latest code from Subversion using setuptools or
-zc.buildout via this URL:
-
-http://svn.dataflake.org/svn/dataflake.ldapconnection/trunk#egg=dataflake.ldapconnection
-

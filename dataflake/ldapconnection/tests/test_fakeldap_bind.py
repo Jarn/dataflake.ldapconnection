@@ -12,7 +12,7 @@
 ##############################################################################
 """ test_fakeldap_bind: Tests for the FakeLDAP simple_bind_s method
 
-$Id: test_fakeldap_bind.py 1901 2010-02-07 19:01:08Z jens $
+$Id$
 """
 
 import doctest

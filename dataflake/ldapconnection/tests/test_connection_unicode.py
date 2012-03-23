@@ -13,7 +13,7 @@
 ##############################################################################
 """ test_connection_unicode: Tests for the LDAPConnection Unicode support
 
-$Id:$
+$Id$
 """
 
 import unittest

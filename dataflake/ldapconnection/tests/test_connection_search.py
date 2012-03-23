@@ -12,7 +12,7 @@
 ##############################################################################
 """ test_connection_search: Tests for the LDAPConnection search method
 
-$Id: test_connection_search.py 1916 2010-04-12 11:50:39Z jens $
+$Id$
 """
 
 import unittest

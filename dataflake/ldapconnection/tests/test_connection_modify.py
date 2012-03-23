@@ -12,7 +12,7 @@
 ##############################################################################
 """ test_connection_modify: Tests for the LDAPConnection modify method
 
-$Id: test_connection_modify.py 1916 2010-04-12 11:50:39Z jens $
+$Id$
 """
 
 import unittest

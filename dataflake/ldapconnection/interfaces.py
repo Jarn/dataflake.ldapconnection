@@ -12,7 +12,7 @@
 ##############################################################################
 """ dataflake.ldapconnnection interfaces
 
-$Id: interfaces.py 1889 2010-02-02 21:55:08Z jens $
+$Id$
 """
 
 from zope.interface import Interface

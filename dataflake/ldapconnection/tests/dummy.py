@@ -12,7 +12,7 @@
 ##############################################################################
 """ dummy: dummy test fixtures
 
-$Id: dummy.py 1897 2010-02-06 13:27:07Z jens $
+$Id$
 """
 
 ISO_8859_1_UNICODE = u'\xe4\xf6\xfc\xdf' # Umlauts a, o, u, sharp s

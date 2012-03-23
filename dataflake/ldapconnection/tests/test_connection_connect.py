@@ -12,7 +12,7 @@
 ##############################################################################
 """ test_connection_connect: Tests for the LDAPConnection connect method
 
-$Id: test_connection_connect.py 1901 2010-02-07 19:01:08Z jens $
+$Id$
 """
 
 import unittest

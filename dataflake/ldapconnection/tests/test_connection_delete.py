@@ -12,7 +12,7 @@
 ##############################################################################
 """ test_connection_delete: Tests for the LDAPConnection delete method
 
-$Id: test_connection_delete.py 1901 2010-02-07 19:01:08Z jens $
+$Id$
 """
 
 import unittest

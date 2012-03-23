@@ -13,7 +13,7 @@
 ##############################################################################
 """ test_fakeldap_search: Tests for the FakeLDAP search_s method
 
-$Id: test_fakeldap_search.py 1916 2010-04-12 11:50:39Z jens $
+$Id$
 """
 
 import doctest

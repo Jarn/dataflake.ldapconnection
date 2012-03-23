@@ -3,7 +3,7 @@ Installation
 
 You will need `Python <http://python.org>`_ version 2.4 or better to
 run :mod:`dataflake.ldapconnection`.  Development of 
-:mod:`dataflake.ldapconnection` is done primarily under Python 2.6, so 
+:mod:`dataflake.ldapconnection` is done primarily under Python 2.7, so 
 that version is recommended.
 
 .. warning:: To successfully install :mod:`dataflake.ldapconnection`, 
@@ -23,7 +23,7 @@ following command::
   $ easy_install dataflake.ldapconnection
 
 If you use :mod:`zc.buildout` you can add :mod:`dataflake.ldapconnection`
-to the necessary ``egss`` section to have it pulled in automatically.
+to the necessary ``eggs`` section to have it pulled in automatically.
 
 When you ``easy_install`` :mod:`dataflake.ldapconnection`, the
 :term:`python-ldap` libraries are installed if they are not present.

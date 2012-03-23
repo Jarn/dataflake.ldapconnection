@@ -12,7 +12,7 @@
 ##############################################################################
 """ test_connection_insert: Tests for the LDAPConnection insert method
 
-$Id: test_connection_insert.py 1897 2010-02-06 13:27:07Z jens $
+$Id$
 """
 
 import unittest

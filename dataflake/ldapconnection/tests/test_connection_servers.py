@@ -12,7 +12,7 @@
 ##############################################################################
 """ test_connection: Tests for the LDAPConnection class
 
-$Id: test_connection_servers.py 1895 2010-02-04 21:09:28Z jens $
+$Id$
 """
 
 import ldapurl

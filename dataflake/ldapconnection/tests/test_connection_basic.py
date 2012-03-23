@@ -12,7 +12,7 @@
 ##############################################################################
 """ test_connection_basic: Basic tests for the LDAPConnection class
 
-$Id: test_connection_basic.py 1895 2010-02-04 21:09:28Z jens $
+$Id$
 """
 
 import unittest

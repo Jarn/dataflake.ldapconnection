@@ -3,6 +3,8 @@ Change log
 
 1.3 (unreleased)
 ----------------
+- switched documentation to point to the new Git repository
+
 - fakeldap: Add email characters and some non-ASCII characters to
   FLTR_RE, to be able to use them in searches.
   [stefan]
@@ -171,7 +173,6 @@ Change log
 
 0.4 (2008-12-25)
 ----------------
-
 - fakeldap bug: the modify_s method would expect changes of type MOD_DELETE
   to come with a list of specific attribute values to delete. Now the 
   attribute will be deleted as a whole if the expected list is None, this

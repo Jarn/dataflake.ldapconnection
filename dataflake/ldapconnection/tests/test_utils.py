@@ -12,7 +12,7 @@
 ##############################################################################
 """ test_utils: Tests for the utils utility functions
 
-$Id: test_utils.py 1874 2010-01-26 11:55:18Z jens $
+$Id$
 """
 
 import unittest

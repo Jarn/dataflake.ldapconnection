@@ -12,7 +12,7 @@
 ##############################################################################
 """ test_fakeldap_addelete: Tests for the FakeLDAP add_s and delete_s methods
 
-$Id: test_fakeldap_adddelete.py 1901 2010-02-07 19:01:08Z jens $
+$Id$
 """
 
 import unittest

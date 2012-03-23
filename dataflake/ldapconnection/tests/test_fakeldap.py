@@ -13,7 +13,7 @@
 ##############################################################################
 """ test_fakeldap: Tests for the FakeLDAP testing fixture
 
-$Id: test_fakeldap.py 1901 2010-02-07 19:01:08Z jens $
+$Id$
 """
 
 import doctest
